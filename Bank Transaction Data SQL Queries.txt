@@ -1,0 +1,96 @@
+--calculating overall fraud rate
+SELECT 
+    SUM(`Fraud Flag`) * 1.0 / COUNT(*) AS overall_fraud_rate
+FROM bank_transaction_data;
+
+--calculating overall fail rate
+SELECT 
+    SUM(`Fail Flag`) * 1.0 / COUNT(*) AS overall_fail_rate
+FROM bank_transaction_data;
+
+--calculating average latency
+SELECT 
+    AVG(`Latency (ms)`) AS avg_latency
+FROM bank_transaction_data;
+
+--calculating total transactions
+SELECT
+	COUNT(`Transaction ID`) AS total_transactions
+FROM bank_transaction_data;
+
+--determining fraud rate by transaction type
+SELECT 
+	`Transaction Type`,
+    AVG(`Fraud Flag`) AS fraud_rate
+FROM bank_transaction_data
+GROUP BY `Transaction Type`;
+
+--determining fraud rate by device used
+SELECT 
+	`Device Used`,
+    AVG(`Fraud Flag`) AS fraud_rate
+FROM bank_transaction_data
+GROUP BY `Device Used`;
+
+--determining fraud rate by minutes
+SELECT 
+	Minute,
+    AVG(`Fraud Flag`) AS fraud_rate
+FROM bank_transaction_data
+GROUP BY Minute
+ORDER BY Minute;
+
+--determining latency by minute
+SELECT 
+	Minute,
+    AVG(`Latency (ms)`) AS avg_latency
+FROM bank_transaction_data
+GROUP BY Minute
+ORDER BY Minute;
+
+--determining failure rate by transaction type
+SELECT 
+	`Transaction Type`,
+    AVG(`Fail Flag`) AS fail_rate
+FROM bank_transaction_data
+GROUP BY `Transaction Type`;
+
+--determining failure rate by device used
+SELECT 
+	`Device Used`,
+    AVG(`Fail Flag`) AS fail_rate
+FROM bank_transaction_data
+GROUP BY `Device Used`;
+
+--Average latency by transaction type
+SELECT 
+	`Transaction Type`,
+    AVG(`Latency (ms)`) AS avg_latency
+FROM bank_transaction_data
+GROUP BY `Transaction Type`;
+
+--Correlation between fraud rate and latency (by minute) (do fraud spikes align with latency spikes)
+SELECT 
+    Minute,
+    AVG(`fraud flag`) AS fraud_rate,
+    AVG(`latency (ms)`) AS avg_latency_ms
+FROM bank_transaction_data
+GROUP BY Minute
+ORDER BY Minute;
+
+--Correlation between failure rate and latency (by transaction type) (do slow devices (latency times) fail more often)
+SELECT 
+	`Transaction Type`,
+    AVG(`fail flag`) AS fail_rate,
+    AVG(`latency (ms)`) AS avg_latency_ms
+FROM bank_transaction_data
+GROUP BY `Transaction Type`;
+
+--Correlation between failure rate and fraud rate (by device type) (do devices with high failure also show high fraud)
+SELECT 
+    `device used`,
+    AVG(`Fraud Flag`) AS fraud_rate,
+    AVG(`fail flag`) AS failure_rate
+FROM bank_transaction_data
+GROUP BY `device used`
+ORDER BY fraud_rate DESC;
